@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Bundeshaushalt</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+</head>
+<body>
+<h2>Summary of Current Year Position:</h2>
+<div class="chart" id="table1">
+      <script>
+          var graphs = {{plot | safe}};
+          Plotly.plot('table1',graphs,{});
+      </script>
+    </div>
+    <br>
+    <br>
+<h2>Summary of Next Year Proposed Budget:</h2>
+<div class="chart" id="table2">
+      <script>
+          var graphs2 = {{plot2 | safe}};
+          Plotly.plot('table2',graphs2,{});
+      </script>
+    </div>
+<div class="container">
+  <div class="col-xs-3">
+  <h4>Select a year below to view summary information about a prior year:</h4>
+  <form action="/year_results" method="GET", id='year_cat'>
+  <select class="form-control" name="Year", id='year_cat'>
+      {% for i in range(0, year_len)%}
+      <option value={{years[i]}}>{{years[i]}}</option>
+      {% endfor %}
+  </select>
+  <input type="submit" value="Enter"></input>
+</form>
+</div>
+</div>
+
+<div class="container">
+  <div class="col-xs-3">
+  <h4>Select a tax source to view a summary of its trend analysis:</h4>
+  <form action="/tax_detail" method="GET", id='revenue_cat'>
+  <select class="form-control" name="Tax", id='revenue_cat'>
+      {% for i in range(0, rev_len)%}
+      <option value="{{revenue_category[i]}}">{{revenue_category[i]}}</option>
+      {% endfor %}
+  </select>
+  <input type="submit" value="Enter"></input>
+</form>
+</div>
+</div>
+
+<div class="container">
+  <div class="col-xs-3">
+  <h4>Select an expense category to view a summary of its trend analysis:</h4>
+  <form action="/expense_detail" method="GET", id='expense_cat'>
+  <select class="form-control" name="Expense", id='expense_cat'>
+      {% for i in range(0, exp_len)%}
+      <option value="{{expense_category[i]}}">{{expense_category[i]}}</option>
+      {% endfor %}
+  </select>
+  <input type="submit" value="Enter"></input>
+</form>
+</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plots.js') }}"></script>
+
+</body>
+</html>

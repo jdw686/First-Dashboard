@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{category}}</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+</head>
+<body>
+<h2>Summary Information for {{category}}</h2>
+<h4>
+<div class="chart" id="summary_table">
+      <script>
+          var graphs = {{plot4 | safe}};
+          Plotly.plot('summary_table',graphs,{});
+      </script><!-- this connects to the bargraph in js file -->
+</div></h4>
+<br>
+<h2>Monthly Information for {{category}}</h2>
+<div class="chart" id="collections">
+      <script>
+          var graphs = {{plot5 | safe}};
+          Plotly.plot('collections',graphs,{});
+      </script><!-- this connects to the bargraph in js file -->
+</div>
+<h2>Trend Information for {{category}}</h2>
+<div class="chart" id="bargraph">
+      <script>
+          var graphs = {{plot | safe}};
+          Plotly.plot('bargraph',graphs,{});
+      </script><!-- this connects to the bargraph in js file -->
+</div>
+<h2>Average Percentage Change for {{category}}: {{'%0.2f' % avg_change|float}}%</h2>
+<div class="chart" id="barchange">
+      <script>
+          var graphs = {{plot2 | safe}};
+          Plotly.plot('barchange',graphs,{});
+      </script><!-- this connects to the bargraph in js file -->
+</div>
+
+<div class="chart" id="taxtable">
+      <script>
+          var graphs = {{plot3 | safe}};
+          Plotly.plot('taxtable',graphs,{});
+      </script><!-- this connects to the bargraph in js file -->
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bar_plots.js') }}"></script>
+</body>
+</html>
