@@ -1,1 +1,1 @@
-web: gunicorn FirstDashboard:FirstDashboard
+web: gunicorn FirstDashboard:app
