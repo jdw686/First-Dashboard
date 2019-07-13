@@ -14,7 +14,7 @@ import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost:5431/tax-dashboard'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost:5431/tax-dashboard'
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 
@@ -22,7 +22,7 @@ db = SQLAlchemy(app)
 class Bundessteuern(db.Model):
     __tablename__ = 'Bundessteuern'
 
-    id = db.Column(db.Integer, primary_key=True)
+    index = db.Column(db.Integer, primary_key=True)
     category = db.Column(db.String())
     current_year_total = db.Column(db.Float())
     date = db.Column(db.String())
@@ -54,7 +54,7 @@ class Bundessteuern(db.Model):
 class Ausgaben(db.Model):
     __tablename__ = 'Ausgaben'
 
-    id = db.Column(db.Integer, primary_key=True)
+    index = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String())
     category = db.Column(db.String())
     prior_total_YE = db.Column(db.Integer)
@@ -85,7 +85,7 @@ class Ausgaben(db.Model):
 class Revenue_Budget(db.Model):
     __tablename__ = 'Revenue Budget'
 
-    id = db.Column(db.Integer, primary_key=True)
+    index = db.Column(db.Integer, primary_key=True)
     category = db.Column(db.String())
     budget = db.Column(db.Integer())
     year = db.Column(db.Integer())
