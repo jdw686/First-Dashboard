@@ -14,11 +14,11 @@ import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost:5431/tax-dashboard'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://dxlnpgnglkqmcd:fc7936ceac1b223314ee24e8c37ecf0b0ecc5008b91942e1375875401539afc2@ec2-174-129-29-101.compute-1.amazonaws.com:5432/d9uoq5736ev151'
 heroku = Heroku(app)
 # db = SQLAlchemy(app)
 
-connection = create_engine('postgres://localhost:5431/taxes', echo=True)
+connection = create_engine('postgres://dxlnpgnglkqmcd:fc7936ceac1b223314ee24e8c37ecf0b0ecc5008b91942e1375875401539afc2@ec2-174-129-29-101.compute-1.amazonaws.com:5432/d9uoq5736ev151', echo=True)
 revenue = pd.read_sql_table('Bundessteuern', connection).sort_values(by='index')
 expense = pd.read_sql_table('Ausgaben', connection).sort_values(by='index')
 revenue_budget = pd.read_sql_table('Revenue Budget', connection).sort_values(by='index')
