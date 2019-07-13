@@ -1,4 +1,3 @@
-
 import os
 from flask import Flask, render_template,request
 import plotly
@@ -6,17 +5,106 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
 from sqlalchemy import create_engine
+from flask_sqlalchemy import SQLAlchemy
+from flask_heroku import Heroku
 
 import pandas as pd
 import numpy as np
 import json
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost:5431/tax-dashboard'
+heroku = Heroku(app)
+db = SQLAlchemy(app)
+
+#create the database model
+class Bundessteuern(db.Model):
+    __tablename__ = 'Bundessteuern'
+
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String())
+    current_year_total = db.Column(db.Float())
+    date = db.Column(db.String())
+    difference_method = db.Column(db.Float())
+    month = db.Column(db.Integer)
+    monthly_total = db.Column(db.Float())
+    percentage_method = db.Column(db.Float())
+    prior_year_total = db.Column(db.Float())
+    rolling_total = db.Column(db.Float())
+    year = db.Column(db.Integer)
+    category_en = db.Column(db.String())
+
+    def __init__(self, category, current_year_total, date, difference_method, month, monthly_total, percentage_method, prior_year_total, rolling_total, year, category_en):
+        self.category = category
+        self.current_year_total = current_year_total
+        self.date = date
+        self.difference_method = difference_method
+        self.month = month
+        self.monthly_total = monthly_total
+        self.percentage_method = percentage_method
+        self.prior_year_total = prior_year_total
+        self.rolling_total = rolling_total
+        self.year = year
+        self.category_en = category_en
+
+    def __repr__(self):
+        return '<category %r>' % self.category
+
+class Ausgaben(db.Model):
+    __tablename__ = 'Ausgaben'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String())
+    category = db.Column(db.String())
+    prior_total_YE = db.Column(db.Integer)
+    budget = db.Column(db.Integer)
+    current_year_total = db.Column(db.Integer)
+    prior_year_total = db.Column(db.Integer)
+    month = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    monthly_total = db.Column(db.Float())
+    category_en = db.Column(db.String())
+
+    def __init__(self, category, current_year_total, date, difference_method, month, monthly_total, percentage_method, prior_year_total, rolling_total, year, category_en):
+        self.category = category
+        self.current_year_total = current_year_total
+        self.date = date
+        self.difference_method = difference_method
+        self.month = month
+        self.monthly_total = monthly_total
+        self.percentage_method = percentage_method
+        self.prior_year_total = prior_year_total
+        self.rolling_total = rolling_total
+        self.year = year
+        self.category_en = category_en
+
+    def __repr__(self):
+        return '<category %r>' % self.category
+
+class Revenue_Budget(db.Model):
+    __tablename__ = 'Revenue Budget'
+
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String())
+    budget = db.Column(db.Integer())
+    year = db.Column(db.Integer())
+    category_en = db.Column(db.String())
+
+    def __init__(self, category, budget, year):
+        self.category = category
+        self.budget = budget
+        self.year = year
+        self.category_en = category_en
+
+    def __repr__(self):
+        return '<category %r>' % self.category
+
 
 connection = create_engine('postgres://localhost:5431/taxes', echo=True)
-revenue = pd.read_sql_table('Bundessteuern', connection)
-expense = pd.read_sql_table('Ausgaben', connection)
-revenue_budget = pd.read_sql_table('Revenue Budget', connection)
+revenue = pd.read_sql_table('Bundessteuern', connection).sort_values(by='index')
+expense = pd.read_sql_table('Ausgaben', connection).sort_values(by='index')
+revenue_budget = pd.read_sql_table('Revenue Budget', connection).sort_values(by='index')
 
 #index tables
 def cy_estimate_table(year):
@@ -98,10 +186,10 @@ def tax_detail_info(category):
     #summary info comparing prior year actual, current year estimate, and next year proposed budget
     cy_summary = pd.DataFrame()
     #define the data
-    ny_estimate = int(list(revenue[(revenue['Category'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-1])
-    cy_estimate = int(list(revenue[(revenue['Category'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-2])
-    py_actual = int(list(revenue[(revenue['Category'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-3])
-    py2_actual = int(list(revenue[(revenue['Category'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-4])
+    ny_estimate = int(list(revenue[(revenue['category_en'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-1])
+    cy_estimate = int(list(revenue[(revenue['category_en'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-2])
+    py_actual = int(list(revenue[(revenue['category_en'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-3])
+    py2_actual = int(list(revenue[(revenue['category_en'] == category) & (revenue['Month'] == 12)]['Rolling Total'])[-4])
     #create the columns in the dataframe
     cy_summary['Current Year Estimate'] = ['Proposed Next Year Estimate', 'Current Year Estimate', 'Prior Year Actual']
     cy_summary['Estimates (in million €)'] = [ny_estimate, cy_estimate, py_actual]
@@ -112,27 +200,27 @@ def tax_detail_info(category):
     summary_data = ff.create_table(cy_summary, colorscale=colorscale, height_constant=15)
     summary_data.layout.width = 800
 
-    cy_revenues = revenue[(revenue['Category'] == category) & (revenue['Year'] == 2018)]['Monthly Total']
-    ly_revenues= revenue[(revenue['Category'] == category) & (revenue['Year'] == 2017)]['Monthly Total']
-    ly2_revenues = revenue[(revenue['Category'] == category) & (revenue['Year'] == 2016)]['Monthly Total']
+    cy_revenues = revenue[(revenue['category_en'] == category) & (revenue['Year'] == 2018)]['Monthly Total']
+    ly_revenues= revenue[(revenue['category_en'] == category) & (revenue['Year'] == 2017)]['Monthly Total']
+    ly2_revenues = revenue[(revenue['category_en'] == category) & (revenue['Year'] == 2016)]['Monthly Total']
 
     trace1 = go.Bar(x=revenue['Month'].unique(), y=ly2_revenues, marker=dict(color='#31ca31'), name = '2016')
     trace2 = go.Bar(x=revenue['Month'].unique(), y=ly_revenues, marker=dict(color='#2aab2a'), name = '2017')
     trace3 = go.Bar(x=revenue['Month'].unique(), y=cy_revenues, marker=dict(color='#228b22'), name = '2018')
 
     #line chart of the tax selected
-    revenue_category = revenue[(revenue['Category'] == category) & (revenue['Year'] <= 2018) & (revenue['Month'] == 12)]
+    revenue_category = revenue[(revenue['category_en'] == category) & (revenue['Year'] <= 2018) & (revenue['Month'] == 12)]
     x = revenue_category['Year'].unique()
     y = revenue_category['Rolling Total'].round(0)
     df = pd.DataFrame({'Tax Year': x, 'Year End Result': y}) # creating a sample dataframe
     line_data = [go.Scatter(x=df['Tax Year'], y=df['Year End Result'], marker=dict(color='#228b22'), name = category)]
     #bar chart of the percentage change
     years = revenue_category['Year'].unique()
-    pct_change = revenue_category[(revenue_category['Category'] == category) & (revenue_category['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change()
+    pct_change = revenue_category[(revenue_category['category_en'] == category) & (revenue_category['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change()
     bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color=['#228b22' if (list(pct_change)[i] > 0) else '#800000' for i in range(len(years))]), name = category)]
     #table showing annual data
-    tax_table = revenue_category[(revenue_category['Category'] == category)][['Year', 'Current Year Total']].astype(int)
-    tax_table['Budget'] = list(revenue_budget[(revenue_budget['Category'] == category) & (revenue_budget['Year'] <= 2018)]['Budget'])
+    tax_table = revenue_category[(revenue_category['category_en'] == category)][['Year', 'Current Year Total']].astype(int)
+    tax_table['Budget'] = list(revenue_budget[(revenue_budget['category_en'] == category) & (revenue_budget['Year'] <= 2018)]['Budget'])
     tax_table['Variance (in %)'] = (((tax_table['Current Year Total']/tax_table['Budget'])-1)*100).round(1)
     colorscale = [[0, '#228b22'],[.5, '#c9ffc9'],[1, '#ffffff']]
     data = ff.create_table(tax_table, colorscale=colorscale, height_constant=15)
@@ -145,26 +233,26 @@ def tax_detail_info(category):
     return bar_chart, bar_change, tax_source_table, summary_table, collections_bar
 
 def expense_detail_info(category):
-    cy_expenses = expense[(expense['Category'] == category) & (expense['Year'] == 2019)]['Monthly Total']
-    ly_expenses = expense[(expense['Category'] == category) & (expense['Year'] == 2018)]['Monthly Total']
-    ly2_expenses = expense[(expense['Category'] == category) & (expense['Year'] == 2017)]['Monthly Total']
+    cy_expenses = expense[(expense['category_en'] == category) & (expense['Year'] == 2019)]['Monthly Total']
+    ly_expenses = expense[(expense['category_en'] == category) & (expense['Year'] == 2018)]['Monthly Total']
+    ly2_expenses = expense[(expense['category_en'] == category) & (expense['Year'] == 2017)]['Monthly Total']
 
     trace1 = go.Bar(x=expense['Month'].unique(), y=ly2_expenses, marker=dict(color='#ffbbbb'), name = '2017')
     trace2 = go.Bar(x=expense['Month'].unique(), y=ly_expenses, marker=dict(color='#bb0000'), name = '2018')
     trace3 = go.Bar(x=expense['Month'].unique(), y=cy_expenses, marker=dict(color='#800000'), name = '2019')
 
     #line chart of the tax selected
-    expense_category = expense[(expense['Category'] == category) & (expense['Year'] <= 2018) & (expense['Month'] == 12)]
+    expense_category = expense[(expense['category_en'] == category) & (expense['Year'] <= 2018) & (expense['Month'] == 12)]
     x = expense_category['Year'].unique()
     y = expense_category['Current Year Total'].round(0)
     df = pd.DataFrame({'Tax Year': x, 'Year End Result': y}) # creating a sample dataframe
     line_data = [go.Scatter(x=df['Tax Year'], y=df['Year End Result'], marker=dict(color='#800000'), name = category)]
     #bar chart of the percentage change
     years = expense_category['Year'].unique()
-    pct_change = expense_category[(expense_category['Category'] == category) & (expense_category['Month'] == 12)].groupby('Year')['Current Year Total'].pct_change()
+    pct_change = expense_category[(expense_category['category_en'] == category) & (expense_category['Month'] == 12)].groupby('Year')['Current Year Total'].pct_change()
     bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color=['#800000' if (list(pct_change)[i] >= 0) else '#228b22' for i in range(len(years))]), name = category)]
     #table showing annual data
-    tax_table = expense_category[(expense_category['Category'] == category)][['Year', 'Budget', 'Current Year Total']].astype(int)
+    tax_table = expense_category[(expense_category['category_en'] == category)][['Year', 'Budget', 'Current Year Total']].astype(int)
     tax_table['Variance (in %)'] = (((tax_table['Current Year Total']/tax_table['Budget'])-1)*100).round(1)
     colorscale = [[0, '#800000'],[.5, '#f08080'],[1, '#ffffff']]
     data = ff.create_table(tax_table, colorscale=colorscale, height_constant=15)
@@ -179,9 +267,11 @@ def expense_detail_info(category):
 def index():
     table = cy_estimate_table(2019)
     table_ny = ny_table(2020)
-    years = expense['Year'].unique()[3:-1]
-    revenue_categories = revenue['Category'].unique()
-    expense_categories = expense['Category'].unique()
+    years = expense['Year'].unique()
+    revenue_categories = revenue['category_en'].unique()
+    revenue_categories_en = revenue['category_en'].unique()
+    expense_categories = expense['category_en'].unique()
+    expense_categories_en = expense['category_en'].unique()
     return render_template('index.html',
                             plot=table,
                             plot2=table_ny,
@@ -189,8 +279,10 @@ def index():
                             years=years,
                             rev_len = len(revenue_categories),
                             revenue_category=revenue_categories,
+                            revenue_category_en=revenue_categories_en,
                             exp_len = len(expense_categories),
-                            expense_category=expense_categories)
+                            expense_category=expense_categories,
+                            expense_category_en=expense_categories_en)
 
 
 @app.route('/year_results', methods=['GET', 'POST'])
@@ -212,7 +304,7 @@ def results():
 @app.route('/tax_detail', methods=['GET', 'POST'])
 def tax_detail():
     category = request.args["Tax"]
-    avg_change = revenue[(revenue['Category'] == category) & (revenue['Year'] <= 2018) & (revenue['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change().mean()
+    avg_change = revenue[(revenue['category_en'] == category) & (revenue['Year'] <= 2018) & (revenue['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change().mean()
     bar = tax_detail_info(category)
     return render_template('tax_detail.html',
                             avg_change = avg_change*100,
@@ -226,7 +318,7 @@ def tax_detail():
 @app.route('/expense_detail', methods=['GET', 'POST'])
 def expense_detail():
     category = request.args["Expense"]
-    avg_change = expense[(expense['Category'] == category) & (expense['Year'] <= 2018) & (expense['Month'] == 12)].groupby('Year')['Current Year Total'].pct_change().mean()
+    avg_change = expense[(expense['category_en'] == category) & (expense['Year'] <= 2018) & (expense['Month'] == 12)].groupby('Year')['Current Year Total'].pct_change().mean()
     bar = expense_detail_info(category)
     return render_template('expense_detail.html',
                             avg_change = avg_change*100,
@@ -235,3 +327,7 @@ def expense_detail():
                             category=category,
                             plot3=bar[2],
                             plot4=bar[3])
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run()

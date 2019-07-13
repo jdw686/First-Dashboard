@@ -43,7 +43,7 @@
   <form action="/tax_detail" method="GET", id='revenue_cat'>
   <select class="form-control" name="Tax", id='revenue_cat'>
       {% for i in range(0, rev_len)%}
-      <option value="{{revenue_category[i]}}">{{revenue_category[i]}}</option>
+      <option value="{{revenue_category_en[i]}}">{{revenue_category_en[i]}}</option>
       {% endfor %}
   </select>
   <input type="submit" value="Enter"></input>
@@ -57,7 +57,7 @@
   <form action="/expense_detail" method="GET", id='expense_cat'>
   <select class="form-control" name="Expense", id='expense_cat'>
       {% for i in range(0, exp_len)%}
-      <option value="{{expense_category[i]}}">{{expense_category[i]}}</option>
+      <option value="{{expense_category_en[i]}}">{{expense_category_en[i]}}</option>
       {% endfor %}
   </select>
   <input type="submit" value="Enter"></input>
