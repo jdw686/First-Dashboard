@@ -6,7 +6,7 @@ import plotly.graph_objs as go
 import plotly.figure_factory as ff
 from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
-from flask_heroku import Heroku
+# from flask_heroku import Heroku
 
 import pandas as pd
 import numpy as np
@@ -15,7 +15,7 @@ import json
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://dxlnpgnglkqmcd:fc7936ceac1b223314ee24e8c37ecf0b0ecc5008b91942e1375875401539afc2@ec2-174-129-29-101.compute-1.amazonaws.com:5432/d9uoq5736ev151'
-heroku = Heroku(app)
+# heroku = Heroku(app)
 # db = SQLAlchemy(app)
 
 connection = create_engine('postgres://dxlnpgnglkqmcd:fc7936ceac1b223314ee24e8c37ecf0b0ecc5008b91942e1375875401539afc2@ec2-174-129-29-101.compute-1.amazonaws.com:5432/d9uoq5736ev151', echo=True)
@@ -133,7 +133,7 @@ def tax_detail_info(category):
     line_data = [go.Scatter(x=df['Tax Year'], y=df['Year End Result'], marker=dict(color='#228b22'), name = category)]
     #bar chart of the percentage change
     years = revenue_category['Year'].unique()
-    pct_change = revenue_category[(revenue_category['category_en'] == category) & (revenue_category['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change()
+    pct_change = revenue[(revenue['category_en'] == category) & (revenue['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change().fillna(0)
     bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color=['#228b22' if (list(pct_change)[i] > 0) else '#800000' for i in range(len(years))]), name = category)]
     #table showing annual data
     tax_table = revenue_category[(revenue_category['category_en'] == category)][['Year', 'Current Year Total']].astype(int)
