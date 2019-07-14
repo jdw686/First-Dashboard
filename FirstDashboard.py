@@ -80,18 +80,20 @@ def py_table(year):
     return table, bar_graph
 
 def py_table_revenues(year):
-    py_revenue_table = revenue[(revenue['Year'] == int(year)) & (revenue['Month'] == 12)][['Category', 'Current Year Total']]
+    py_revenue_table = revenue[(revenue['Year'] == int(year)) & (revenue['Month'] == 12)][['category_en', 'Current Year Total']]
+    py_revenue_table.columns = ['Revenue Source', 'Year End Total']
     py_revenue_table['Budget'] = list(revenue_budget[revenue_budget['Year'] == int(year)]['Budget'])
-    py_revenue_table['Variance (in %)'] = (((py_revenue_table['Current Year Total']/py_revenue_table['Budget'])-1)*100).round(1)
-    py_revenue_table = py_revenue_table[['Category', 'Budget', 'Current Year Total', 'Variance (in %)']]
+    py_revenue_table['Variance (in %)'] = (((py_revenue_table['Year End Total']/py_revenue_table['Budget'])-1)*100).round(1)
+    py_revenue_table = py_revenue_table[['Revenue Source', 'Budget', 'Year End Total', 'Variance (in %)']]
     colorscale = [[0, '#228b22'],[.5, '#c9ffc9'],[1, '#ffffff']]
     data = ff.create_table(py_revenue_table, colorscale=colorscale, height_constant=15)
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
 
 def py_table_expenses(year):
-    py_expense_table = expense[(expense['Year'] == int(year)) & (expense['Month'] == 12)][['Category', 'Budget', 'Current Year Total']]
-    py_expense_table['Variance (in %)'] = (((py_expense_table['Current Year Total']/py_expense_table['Budget'])-1)*100).round(1)
+    py_expense_table = expense[(expense['Year'] == int(year)) & (expense['Month'] == 12)][['category_en', 'Budget', 'Current Year Total']]
+    py_expense_table.columns = ['Expense Category', 'Budget', 'Year End Total']
+    py_expense_table['Variance (in %)'] = (((py_expense_table['Year End Total']/py_expense_table['Budget'])-1)*100).round(1)
     colorscale = [[0, '#800000'],[.5, '#f08080'],[1, '#ffffff']]
     data = ff.create_table(py_expense_table, colorscale=colorscale, height_constant=15)
     # data.layout.width = 1750
@@ -132,9 +134,10 @@ def tax_detail_info(category):
     df = pd.DataFrame({'Tax Year': x, 'Year End Result': y}) # creating a sample dataframe
     line_data = [go.Scatter(x=df['Tax Year'], y=df['Year End Result'], marker=dict(color='#228b22'), name = category)]
     #bar chart of the percentage change
-    years = revenue_category['Year'].unique()
+    years = revenue['Year'].unique()
     pct_change = revenue[(revenue['category_en'] == category) & (revenue['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change().fillna(0)
-    bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color=['#228b22' if (list(pct_change)[i] > 0) else '#800000' for i in range(len(years))]), name = category)]
+    bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color='#000080'), name = category)]
+    # bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color=['#228b22' if (list(pct_change)[i] > 0) else '#800000' for i in range(len(years))]), name = category)]
     #table showing annual data
     tax_table = revenue_category[(revenue_category['category_en'] == category)][['Year', 'Current Year Total']].astype(int)
     tax_table['Budget'] = list(revenue_budget[(revenue_budget['category_en'] == category) & (revenue_budget['Year'] <= 2018)]['Budget'])
