@@ -136,8 +136,8 @@ def tax_detail_info(category):
     df = pd.DataFrame({'Tax Year': x, 'Year End Result': y}) # creating a sample dataframe
     line_data = [go.Scatter(x=df['Tax Year'], y=df['Year End Result'], marker=dict(color='#228b22'), name = category)]
     #bar chart of the percentage change
-    years = revenue['Year'].unique()
-    pct_change = revenue[(revenue['category_en'] == category) & (revenue['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change().fillna(0)
+    years = revenue_category['Year'].unique()
+    pct_change = revenue_category[(revenue_category['category_en'] == category) & (revenue_category['Month'] == 12)].groupby('Year')['Rolling Total'].pct_change().fillna(0)
     bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color=['#228b22' if (list(pct_change)[i] >= 0) else '#800000' for i in range(len(years))]), name = category)]
     #table showing annual data
     tax_table = revenue_category[(revenue_category['category_en'] == category)][['Year', 'Current Year Total']].astype(int)
@@ -170,7 +170,7 @@ def expense_detail_info(category):
     line_data = [go.Scatter(x=df['Tax Year'], y=df['Year End Result'], marker=dict(color='#800000'), name = category)]
     #bar chart of the percentage change
     years = expense_category['Year'].unique()
-    pct_change = expense_category[(expense_category['category_en'] == category) & (expense_category['Month'] == 12)].groupby('Year')['Current Year Total'].pct_change()
+    pct_change = expense_category[(expense['category_en'] == category) & (expense_category['Month'] == 12)].groupby('Year')['Current Year Total'].pct_change().fillna(0)
     bar_change_data = [go.Bar(x=years, y=pct_change, marker=dict(color=['#800000' if (list(pct_change)[i] >= 0) else '#228b22' for i in range(len(years))]), name = category)]
     #table showing annual data
     tax_table = expense_category[(expense_category['category_en'] == category)][['Year', 'Budget', 'Current Year Total']].astype(int)
