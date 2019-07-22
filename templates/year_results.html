@@ -3,12 +3,19 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Results</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <style>
+      header {margin: 0; padding: 0; text-align: center; font-family: Avenir Book;}
+      h2 {margin: 0; padding: 0; text-align: center;}
+      .table {margin: 0 auto; display:block; text-align: left; width: 800px;}
+    </style>
 </head>
 <body>
-<h2>Summary Results in {{year}}:</h2>
-          <div class="chart" id="summary_table">
+<header>
+  <h2>Year-End Income and Expenses in {{year}}</h2>
+          <div class="table" id="summary_table">
                 <script>
                     var graphs = {{plot | safe}};
                     Plotly.plot('summary_table',graphs,{});
@@ -24,6 +31,7 @@
           </div>
           <br>
           <br>
+          <h2>Year End Results by Tax Source</h2>
           <div class="chart" id="revenue_table">
                 <script>
                     var graphs = {{plot2 | safe}};
@@ -32,6 +40,7 @@
               </div>
           <br>
           <br>
+          <h2>Year End Results by Expense Category</h2>
           <div class="chart" id="expense_table">
                 <script>
                     var graphs = {{plot3 | safe}};
@@ -42,6 +51,7 @@
         </div>
     </div>
 </div>
+</header>
 <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/plots.js') }}"></script>
 </body>

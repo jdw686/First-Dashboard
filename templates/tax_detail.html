@@ -5,24 +5,37 @@
     <title>{{category}}</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <style>
+      header {margin: 0; padding: 0; text-align: center; font-family: Avenir Book;}
+      h1, h2, p {margin: 0; padding: 0; text-align: center; font-family: Avenir Book}
+      .table {margin: 0 auto; display:block; text-align: left; width: 800px;}
+    </style>
 </head>
+<header>
+  <h1>Tax Detail for {{category}}</h1>
+  <br>
+  <br>
 <body>
 <h2>Summary Information for {{category}}</h2>
-<h4>
-<div class="chart" id="summary_table">
+<div class="table" id="summary_table">
       <script>
           var graphs = {{plot4 | safe}};
           Plotly.plot('summary_table',graphs,{});
       </script>
-</div></h4>
+</div>
 <br>
-<h2>Monthly Information for {{category}}</h2>
+<br>
+<br>
+<h2>Monthly Comparison for {{category}}</h2>
+<p>Comparison of {{category}} of the prior three years.</p>
 <div class="chart" id="collections">
       <script>
           var graphs = {{plot5 | safe}};
           Plotly.plot('collections',graphs,{});
       </script>
 </div>
+<br>
+<br>
 <h2>Trend Information for {{category}}</h2>
 <div class="chart" id="bargraph">
       <script>
@@ -30,16 +43,20 @@
           Plotly.plot('bargraph',graphs,{});
       </script>
 </div>
+<br>
+<br>
 <h2>Average Percentage Change for {{category}}: {{'%0.2f' % avg_change|float}}%</h2>
-<p> (Note: still a work under construction. Renders correctly on localhost but not on Heroku. Thank you for your patience. :)</p>
+<p> Note: still a work under construction. Renders correctly on localhost but not on Heroku. Thank you for your patience. :)</p>
 <div class="chart" id="barchange">
       <script>
           var graphs = {{plot2 | safe}};
           Plotly.plot('barchange',graphs,{});
       </script>
 </div>
-
-<div class="chart" id="taxtable">
+<br>
+<br>
+<h2>Year End Results for {{category}} with Budget to Actual Variance</h2>
+<div class="table" id="taxtable">
       <script>
           var graphs = {{plot3 | safe}};
           Plotly.plot('taxtable',graphs,{});

@@ -2,30 +2,48 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Bundeshaushalt</title>
+    <title>Projected Finances of the German Federal Government</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <style>
+      header, h2, h4, h6 {margin: 0; padding: 0; text-align: center; font-family: Avenir Book;}
+      .chart {margin: 0 auto; display:block; text-align: left; width: 800px;}
+    </style>
 </head>
 <body>
-<h2>Summary of Current Year Position:</h2>
+<header>
+  <h2>Projected Finances of the German Federal Government</h2>
+  <p>This is a sample dashboard website to present my estimates for German federal government tax revenues in 2020.</p>
+</header>
+<br>
+<br>
+<h4 class="chart">Summary of {{current_year}} Estimated Revenue:</h4>
 <div class="chart" id="table1">
-      <script>
+      <object align="middle">
+        <script>
           var graphs = {{plot | safe}};
           Plotly.plot('table1',graphs,{});
       </script>
+    </object>
     </div>
     <br>
     <br>
-<h2>Summary of Next Year Proposed Budget:</h2>
+<h4 class="chart">Summary of {{current_year+1}} Proposed Budget:</h4>
 <div class="chart" id="table2">
       <script>
           var graphs2 = {{plot2 | safe}};
           Plotly.plot('table2',graphs2,{});
       </script>
     </div>
+<br>
+<br>
+<h2>Select an option below to review more details</h2>
+<br>
+<br>
 <div class="container">
   <div class="col-xs-3">
-  <h4>Select a year below to view summary information about a prior year:</h4>
+  <h6>Overall Summary by Year:</h6>
   <form action="/year_results" method="GET", id='year_cat'>
   <select class="form-control" name="Year", id='year_cat'>
       {% for i in range(0, year_len)%}
@@ -36,10 +54,11 @@
 </form>
 </div>
 </div>
-
+<br>
+<br>
 <div class="container">
   <div class="col-xs-3">
-  <h4>Select a tax source to view a summary of its trend analysis:</h4>
+  <h6>Trend Summary by Revenue Source:</h6>
   <form action="/tax_detail" method="GET", id='revenue_cat'>
   <select class="form-control" name="Tax", id='revenue_cat'>
       {% for i in range(0, rev_len)%}
@@ -50,10 +69,11 @@
 </form>
 </div>
 </div>
-
+<br>
+<br>
 <div class="container">
   <div class="col-xs-3">
-  <h4>Select an expense category to view a summary of its trend analysis:</h4>
+  <h6>Trend Summary by Expense Category:</h6>
   <form action="/expense_detail" method="GET", id='expense_cat'>
   <select class="form-control" name="Expense", id='expense_cat'>
       {% for i in range(0, exp_len)%}
