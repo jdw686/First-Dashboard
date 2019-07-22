@@ -1,0 +1,30 @@
+/* * represents every html element in my HTML file. */
+* {
+  /* code I put in here is styling that will apply to * */
+  /* background: lightblue; */
+}
+
+/* 1. target html element by tag Name */
+div {
+  /* whatever is in here will apply to every single div */
+}
+
+/* 2. target html elements by their class. . represents class */
+.my-div {
+
+}
+
+/* 3. target html elements by their id. */
+#my-id {
+
+}
+
+h2 {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 300;
+  /* letter-spacing: 1px; */
+  color: hotpink; /*color of text */
+  background: lightblue;
+
+}
